@@ -6,7 +6,7 @@ const path = require('path');
 const cors = require('cors');
 
 const app = express();
-const PORT = 3000;
+const PORT = 49153;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -60,6 +60,6 @@ app.post('/generate-logo', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`);
+app.listen(49153, '0.0.0.0', () => { 
+    console.log('Server is running on port 49153');
 });
