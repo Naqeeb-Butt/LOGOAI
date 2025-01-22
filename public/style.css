@@ -1,0 +1,365 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  line-height: 1.5;
+  color: #fff;
+  background: url('background-img.jpg') no-repeat center center fixed;
+  background-size: cover;
+  background-attachment: fixed;
+  min-height: 100vh;
+  overflow: auto;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #f5f5f5;
+}
+
+.profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-name {
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+}
+.loading-message {
+  font-size: 18px;
+  font-weight: 600;
+  color: #007bff;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.error-message {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ff0000;
+  text-align: center;
+  margin: 20px 0;
+}
+
+
+.navbar {
+  background-color: rgba(0, 0, 0, 0.7); /* Transparent dark background */
+  color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  padding: 15px 30px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+}
+
+.navbar.sticky {
+  background-color: #1f2937; /* Darker shade when sticky */
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+}
+
+.nav-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo img {
+  height: 80px;
+  transition: transform 0.3s ease;
+}
+
+.logo img:hover {
+  transform: scale(1.1);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.language-select {
+  padding: 8px 16px;
+  border-radius: 25px;
+  background-color: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.language-select:hover {
+  background-color: #4a90e2;
+  cursor: pointer;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.sign-in-btn, .sign-up-btn, .btn {
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: transparent;
+  border: 2px solid #fff;
+  color: white;
+}
+
+.sign-in-btn:hover, .sign-up-btn:hover {
+  background-color: #4a90e2;
+  color: #fff;
+  border-color: #4a90e2;
+}
+
+/* Main content */
+.main-content {
+  padding: 40px 0;
+  flex: 1;
+  padding: 0 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+}
+
+
+@media (min-width: 992px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Settings panel */
+
+.container{
+  padding: 20px;
+}
+.settings-panel, .preview-panel {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  transition: transform 0.3s ease;
+}
+
+.settings-panel:hover, .preview-panel:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+h2 {
+  font-size: 22px;
+  margin-bottom: 20px;
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.input-group {
+  margin-bottom: 25px;
+}
+
+.input-field {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #555;
+}
+
+input, select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #333;
+  transition: border-color 0.3s ease;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 5px rgba(74, 144, 226, 0.4);
+}
+
+.selection-group {
+  margin-bottom: 25px;
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.color-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.color-btn:hover {
+  transform: scale(1.1);
+}
+
+.color-btn.selected {
+  border-color: #4a90e2;
+  transform: scale(1.2);
+  box-shadow: 0 0 8px rgba(74, 144, 226, 0.5);
+}
+
+.generate-btn, .download-btn {
+  width: 100%;
+  padding: 15px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.generate-btn:hover, .download-btn:hover {
+  background-color: #357abd;
+  transform: translateY(-3px);
+}
+
+.download-btn {
+  margin-top: 20px;
+}
+
+/* Preview area */
+.preview-area {
+  aspect-ratio: 1;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.preview-placeholder {
+  color: #aaa;
+  text-align: center;
+}
+
+.preview-content {
+  text-align: center;
+}
+
+.preview-content h1 {
+  font-size: 36px;
+  margin-bottom: 10px;
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.preview-content p {
+  font-size: 18px;
+  color: #666;
+}
+
+/* Scrollbar styling */
+.color-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.color-grid::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.color-grid::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Loading state */
+.loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  border: 2px solid #4a90e2;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+footer {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.875rem;
+  width: 100%;
+}
+
+
+footer a {
+  color: #71B3C5;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

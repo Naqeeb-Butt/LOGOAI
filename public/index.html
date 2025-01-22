@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logo Generator</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="fav-icon.PNG" type="image/x-icon">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-content">
+      <div class="logo">
+        <img src="logo-AI.png" alt="logo" style="height: 120px;" width="120px">
+      </div>
+      <div class="nav-right">
+        <select id="languageSelect" class="language-select" onchange="changeLanguage()">
+          <option value="en">English</option>
+          <option value="zh">简体中文</option>
+        </select>
+        <div class="auth-buttons">
+          <button class="sign-in-btn" data-en="Sign In" data-zh="登录" onclick="window.location.href='signin.html'">Sign In</button>
+          <button class="sign-up-btn" data-en="Sign Up" data-zh="注册" onclick="window.location.href='signup.html'">Sign Up</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="min-h-screen">
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="container">
+        <div class="grid">
+          <!-- Left Side - Settings Panel -->
+          <div class="settings-panel">
+            <h2 id="logoSettingsLabel" data-en="Logo Settings" data-zh="徽标设置">Logo Settings</h2>
+            
+            <!-- Company Details -->
+            <div class="input-group">
+              <div class="input-field">
+                <label for="companyName" id="companyNameLabel" data-en="Company Name" data-zh="公司名称">Company Name</label>
+                <input type="text" id="companyName" placeholder="Enter company name">
+              </div>
+              <div class="input-field">
+                <label for="slogan" id="sloganLabel" data-en="Slogan (Optional)" data-zh="标语（可选）">Slogan (Optional)</label>
+                <input type="text" id="slogan" placeholder="Enter company slogan">
+              </div>
+            </div>
+
+            <!-- Industry Selection -->
+            <div class="input-field">
+              <label for="industry" id="industryLabel" data-en="Industry" data-zh="行业">Industry</label>
+              <select id="industry">
+                <option value="" data-en="Select an industry" data-zh="选择行业">Select an industry</option>
+              </select>
+            </div>
+
+            <!-- Color Selection -->
+            <div class="input-field">
+              <label for="color" data-zh="颜色">Color (e.g., brownish)</label>
+              <input type="text" id="color" placeholder="e.g., brownish" required>
+            </div>
+            
+
+            <button class="generate-btn" id="generateBtn" onclick="generateLogo()">Generate Logo</button>
+
+          </div>
+
+          <!-- Right Side - Preview Area -->
+          <div class="preview-panel">
+            <h2 id="previewLabel" data-en="Logo Preview" data-zh="徽标预览">Logo Preview</h2>
+            <div class="preview-area" id="previewArea">
+              <p class="preview-placeholder" data-en="Enter company details to preview logo" data-zh="输入公司详细信息以预览徽标">Enter company details to preview logo</p>
+            </div>
+            <div class="download-area" id="downloadArea" style="display: none;">
+              <button class="download-btn" id="downloadBtn">Download Logo</button>
+            </div>
+                       
+          </div>
+        </div>
+      </div>
+    </main>
+
+
+</div>
+<footer class="footer">
+  <p>&copy; 2025 logoAI Generator. All rights reserved. Powered by 
+      <a href="mailto:robosoftworks.iot@gmail.com" class="footer-link">RoboSoft Works</a>
+  </p>
+</footer>
+
+  <script>
+    function changeLanguage() {
+      const language = document.getElementById('languageSelect').value;
+      const elements = document.querySelectorAll('[data-en], [data-zh]');
+      elements.forEach(element => {
+        const languageText = element.getAttribute(`data-${language}`);
+        element.textContent = languageText;
+      });
+    }
+  </script>
+  
+  <script>
+        window.onscroll = function() {stickyNavbar()};
+    
+        var navbar = document.querySelector(".navbar");
+        var sticky = navbar.offsetTop;
+    
+        function stickyNavbar() {
+          if (window.pageYOffset > sticky) {
+            navbar.classList.add("sticky");
+          } else {
+            navbar.classList.remove("sticky");
+          }
+        }
+  </script>
+<script type="module">
+    import { signInWithGoogle, signOutUser } from "./register.js";
+
+    // Attach event listeners for manual sign-in if needed
+    document.querySelector(".google-btn")?.addEventListener("click", signInWithGoogle);
+</script>
+<script type="module">
+    import { signUpUser } from "./register.js";
+  
+    document.querySelector("#signup-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+  
+      const username = document.querySelector("input[placeholder='Full Name']").value;
+      const email = document.querySelector("input[placeholder='Email']").value;
+      const password = document.querySelector("input[placeholder='Password']").value;
+  
+      try {
+        await signUpUser(username, email, password);
+        alert("Signup successful! Please login.");
+        window.location.href = "signin.html";
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+  </script>
+
+<script src="script.js"></script>
+<script src="register.js"></script>
+</body>
+</html>
