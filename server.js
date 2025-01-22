@@ -65,6 +65,6 @@ app.post('/generate-logo', async (req, res) => {
     }
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(Server is running on http://0.0.0.0:${PORT});
+app.listen(49153, '0.0.0.0', () => { 
+    console.log('Server is running on port 49153');
 });
