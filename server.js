@@ -12,8 +12,8 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const MAX_RETRIES = 5;
-const RETRY_DELAY = 1000; // in milliseconds
+const MAX_RETRIES = 10;
+const RETRY_DELAY = 2000; // in milliseconds
 
 async function retryAxios(requestFn, retries) {
     for (let attempt = 1; attempt <= retries; attempt++) {
