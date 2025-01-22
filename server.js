@@ -12,27 +12,21 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const MAX_RETRIES = 10; // Maximum number of retries
-const RETRY_DELAY = 2000; // Delay between retries in milliseconds
-const MAX_TIMEOUT = 60000; // Maximum timeout (60 seconds)
+const MAX_RETRIES = 5;
+const RETRY_DELAY = 1000; // in milliseconds
 
-async function retryAxios(requestFn) {
-    const startTime = Date.now();
-    let attempt = 0;
-
-    while (Date.now() - startTime < MAX_TIMEOUT) {
-        attempt++;
+async function retryAxios(requestFn, retries) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
         try {
             return await requestFn();
         } catch (error) {
-            console.error(Attempt ${attempt} failed:, error.response?.data || error.message);
-            if (Date.now() - startTime >= MAX_TIMEOUT) {
-                throw new Error('Maximum timeout reached while trying to generate the logo.');
+            console.error(`Attempt ${attempt} failed:`, error.response?.data || error.message);
+            if (attempt === retries) {
+                throw error;
             }
-            await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+            await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY * attempt)); // Exponential backoff
         }
     }
-    throw new Error('Failed to generate logo within the maximum timeout.');
 }
 
 app.post('/generate-logo', async (req, res) => {
@@ -49,18 +43,19 @@ app.post('/generate-logo', async (req, res) => {
                 { inputs },
                 {
                     headers: {
-                        Authorization: Bearer ${process.env.HUGGINGFACE_API_KEY},
+                        Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
                         'Content-Type': 'application/json',
                     },
                     responseType: 'arraybuffer', // Return as binary data
                 }
-            )
+            ),
+            MAX_RETRIES
         );
 
         res.set('Content-Type', 'image/png');
-        res.send(response.data); // Send the image blob
+        res.send(response.data); // Directly send the image blob
     } catch (error) {
-        console.error('Error generating logo after retries:', error.message);
+        console.error('Error generating logo after retries:', error.response?.data || error.message);
         res.status(500).json({ error: 'Failed to generate logo after multiple attempts. Please try again later.' });
     }
 });
