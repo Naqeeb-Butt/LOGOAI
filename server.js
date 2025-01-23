@@ -43,7 +43,7 @@ app.post('/generate-logo', async (req, res) => {
                 { inputs },
                 {
                     headers: {
-                        Authorization: Bearer ${process.env.HUGGINGFACE_API_KEY1},
+                        Authorization: Bearer ${process.env.HUGGINGFACE_API_KEY},
                         'Content-Type': 'application/json',
                     },
                     responseType: 'arraybuffer', // Return as binary data
