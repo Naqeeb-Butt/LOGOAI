@@ -6,7 +6,7 @@ const path = require('path');
 const cors = require('cors');
 
 const app = express();
-const PORT = 49153;
+const PORT = process.env.PORT || 49153;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -37,9 +37,10 @@ app.post('/generate-logo', async (req, res) => {
     }
 
     try {
+        const apiUrl = 'https://api-inference.huggingface.co/models/strangerzonehf/Flux-Midjourney-Mix-LoRA';
         const response = await retryAxios(() =>
             axios.post(
-                'https://api-inference.huggingface.co/models/strangerzonehf/Flux-Midjourney-Mix-LoRA',
+                apiUrl,
                 { inputs },
                 {
                     headers: {
@@ -60,6 +61,11 @@ app.post('/generate-logo', async (req, res) => {
     }
 });
 
-app.listen(49153, '0.0.0.0', () => { 
-    console.log('Server is running on port 49153');
+// Catch-all route for serving static files
+app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+});
+
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
