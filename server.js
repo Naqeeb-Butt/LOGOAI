@@ -71,14 +71,16 @@ app.post('/generate-logo', async (req, res) => {
     }
 });
 
+app.get('/check-env', (req, res) => {
+    res.send(`HUGGINGFACE_API_KEY: ${process.env.HUGGINGFACE_API_KEY}`);
+});
+
 // Catch-all route for serving the frontend
 app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
 
-app.get('/check-env', (req, res) => {
-    res.send(`HUGGINGFACE_API_KEY: ${process.env.HUGGINGFACE_API_KEY}`);
-});
+
 
 
 app.listen(PORT, () => {
