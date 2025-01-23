@@ -76,6 +76,11 @@ app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
 
+app.get('/check-env', (req, res) => {
+    res.send(`HUGGINGFACE_API_KEY: ${process.env.HUGGINGFACE_API_KEY}`);
+});
+
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
