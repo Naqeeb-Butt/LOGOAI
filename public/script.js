@@ -205,7 +205,7 @@ async function generateLogo() {
   try {
     const companyName = document.getElementById('companyName').value.trim();
     const industry = document.getElementById('industry').value;
-    const color = document.getElementById('colorInput').value.trim();
+    const color = document.getElementById('color').value.trim();
 
     // More specific validation
     if (!companyName) {
@@ -218,7 +218,7 @@ async function generateLogo() {
       throw new Error('Please enter a color');
     }
 
-    const response = await fetch('http://0.0.0.0:49153/generate-logo', {
+    const response = await fetch('/generate-logo', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
