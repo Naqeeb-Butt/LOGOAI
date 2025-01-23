@@ -15,6 +15,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const MAX_RETRIES = 5;
 const RETRY_DELAY = 1000; // in milliseconds
 
+// Retry mechanism for API calls
 async function retryAxios(requestFn, retries) {
     for (let attempt = 1; attempt <= retries; attempt++) {
         try {
@@ -29,6 +30,7 @@ async function retryAxios(requestFn, retries) {
     }
 }
 
+// Endpoint to generate logo
 app.post('/generate-logo', async (req, res) => {
     const { inputs } = req.body;
 
@@ -37,6 +39,10 @@ app.post('/generate-logo', async (req, res) => {
     }
 
     try {
+        // Log for debugging
+        console.log('API Key:', process.env.HUGGINGFACE_API_KEY);
+        console.log('Inputs:', inputs);
+
         const response = await retryAxios(() =>
             axios.post(
                 'https://api-inference.huggingface.co/models/strangerzonehf/Flux-Midjourney-Mix-LoRA',
@@ -52,14 +58,11 @@ app.post('/generate-logo', async (req, res) => {
             MAX_RETRIES
         );
 
+        // Send the generated image to the client
         res.set('Content-Type', 'image/png');
-        res.send(response.data); // Directly send the image blob
+        res.send(response.data);
     } catch (error) {
-        console.error('Error generating logo:', {
-            status: error.response?.status,
-            headers: error.response?.headers,
-            data: error.response?.data,
-        });
+        console.error('Error generating logo:', error.response?.data || error.message);
         res.status(500).json({
             error: `Failed to generate logo after multiple attempts. Details: ${
                 error.response?.data?.error || error.message
@@ -68,8 +71,7 @@ app.post('/generate-logo', async (req, res) => {
     }
 });
 
-
-// Catch-all route for serving static files
+// Catch-all route for serving the frontend
 app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
