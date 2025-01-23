@@ -205,7 +205,7 @@ async function generateLogo() {
   try {
     const companyName = document.getElementById('companyName').value.trim();
     const industry = document.getElementById('industry').value;
-    const color = document.getElementById('color').value.trim();
+    const color = document.getElementById('colorInput').value.trim();
 
     // More specific validation
     if (!companyName) {
