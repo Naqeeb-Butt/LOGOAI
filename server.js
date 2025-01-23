@@ -40,7 +40,7 @@ app.post('/generate-logo', async (req, res) => {
 
     try {
         // Log for debugging
-        console.log('API Key:', process.env.HUGGINGFACE_API_KEY);
+        console.log('API Key:', process.env.HUGGINGFACE_API_KEY1);
         console.log('Inputs:', inputs);
 
         const response = await retryAxios(() =>
@@ -49,7 +49,7 @@ app.post('/generate-logo', async (req, res) => {
                 { inputs },
                 {
                     headers: {
-                        Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
+                        Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY1}`,
                         'Content-Type': 'application/json',
                     },
                     responseType: 'arraybuffer', // Return as binary data
@@ -72,7 +72,7 @@ app.post('/generate-logo', async (req, res) => {
 });
 
 app.get('/check-env', (req, res) => {
-    res.send(`HUGGINGFACE_API_KEY: ${process.env.HUGGINGFACE_API_KEY}`);
+    res.send(`HUGGINGFACE_API_KEY1: ${process.env.HUGGINGFACE_API_KEY1}`);
 });
 
 // Catch-all route for serving the frontend
