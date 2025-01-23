@@ -36,41 +36,33 @@ async function retryAxios(requestFn, retries) {
 
 app.post('/generate-logo', async (req, res) => {
     const { inputs } = req.body;
-
-    console.log('Received request:', {
+    
+    console.log('Request received:', {
         inputs,
-        hasApiKey: !!process.env.HUGGINGFACE_API_KEY,
+        hasApiKey: !!process.env.HUGGINGFACE_API_KEY
     });
 
-    if (!process.env.HUGGINGFACE_API_KEY) {
-        console.error('Error: API Key is missing or undefined');
-        return res.status(500).json({
-            error: 'Server configuration issue: API Key is missing',
-        });
-    }
-
     try {
-        const response = await retryAxios(() =>
+        const response = await retryAxios(() => 
             axios.post(
                 'https://api-inference.huggingface.co/models/strangerzonehf/Flux-Midjourney-Mix-LoRA',
                 { inputs },
                 {
                     headers: {
-                        Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
+                        Authorization: Bearer ${process.env.HUGGINGFACE_API_KEY},
                         'Content-Type': 'application/json',
                     },
                     responseType: 'arraybuffer',
+                    validateStatus: false
                 }
             ),
             MAX_RETRIES
         );
 
         if (response.status !== 200) {
-            console.error('Unexpected API Response:', response.status, response.data.toString());
-            throw new Error(`API Error: ${response.statusText}`);
+            throw new Error(API Error: ${response.data.toString()});
         }
 
-        console.log('Successfully generated logo.');
         res.set('Content-Type', 'image/png');
         res.send(response.data);
     } catch (error) {
@@ -78,21 +70,16 @@ app.post('/generate-logo', async (req, res) => {
             message: error.message,
             status: error.response?.status,
             data: error.response?.data?.toString(),
+            stack: error.stack
         });
-
-        if (error.response?.status === 401) {
-            res.status(401).json({
-                error: 'Unauthorized: Check your API key',
-            });
-        } else {
-            res.status(500).json({
-                error: 'Failed to generate logo',
-                details: error.message,
-            });
-        }
+        
+        res.status(500).json({
+            error: 'Failed to generate logo',
+            details: error.message,
+            status: error.response?.status
+        });
     }
 });
-
 
 app.use((err, req, res, next) => {
     console.error('Error:', err);
