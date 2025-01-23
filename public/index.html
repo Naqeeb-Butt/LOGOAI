@@ -59,8 +59,11 @@
 
             <!-- Color Selection -->
             <div class="input-field">
-              <label for="color" data-zh="颜色">Color (e.g., brownish)</label>
-              <input type="text" id="color" placeholder="e.g., brownish" required>
+              <label for="colorInput">Colors</label>
+              <input type="text" 
+                     id="colorInput" 
+                     placeholder="Enter color (e.g. red, blue, #FF0000)"
+                     class="color-input">
             </div>
             
 
@@ -122,27 +125,7 @@
     // Attach event listeners for manual sign-in if needed
     document.querySelector(".google-btn")?.addEventListener("click", signInWithGoogle);
 </script>
-<script type="module">
-    import { signUpUser } from "./register.js";
-  
-    document.querySelector("#signup-form").addEventListener("submit", async (event) => {
-      event.preventDefault();
-  
-      const username = document.querySelector("input[placeholder='Full Name']").value;
-      const email = document.querySelector("input[placeholder='Email']").value;
-      const password = document.querySelector("input[placeholder='Password']").value;
-  
-      try {
-        await signUpUser(username, email, password);
-        alert("Signup successful! Please login.");
-        window.location.href = "signin.html";
-      } catch (error) {
-        alert(error.message);
-      }
-    });
-  </script>
-
+<script type="module" src="register.js"></script>
 <script src="script.js"></script>
-<script src="register.js"></script>
 </body>
 </html>
