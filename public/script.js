@@ -1,3 +1,8 @@
+const FONTS = [
+    'Arial', 'Helvetica', 'Times New Roman', 'Roboto', 
+    'Open Sans', 'Montserrat', 'Playfair Display', 'Lato'
+];
+
 const COLORS = [
   // Primary Colors
   '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD', '#D4A5A5',
@@ -72,14 +77,15 @@ function init() {
     fontSelection.appendChild(button);
   });
 
-  // Create color buttons with tooltips
+  // Create color buttons
+  const colorGrid = document.getElementById('colorSelection');
   COLORS.forEach(color => {
     const button = document.createElement('button');
     button.className = 'color-btn';
     button.style.backgroundColor = color;
     button.title = color;
     button.onclick = () => toggleSelection('selectedColors', color);
-    colorSelection.appendChild(button);
+    colorGrid.appendChild(button);
   });
 
   // Create design buttons
@@ -91,11 +97,19 @@ function init() {
     designSelection.appendChild(button);
   });
 
-  // Add event listeners
-  companyNameInput.addEventListener('input', updateState);
-  sloganInput.addEventListener('input', updateState);
-  industrySelect.addEventListener('change', updateState);
-  generateBtn.addEventListener('click', generateLogo);
+  // Update event listeners
+  companyNameInput.addEventListener('input', (e) => {
+    state.companyName = e.target.value;
+  });
+  
+  sloganInput.addEventListener('input', (e) => {
+    state.slogan = e.target.value;
+  });
+  
+  industrySelect.addEventListener('change', (e) => {
+    state.industry = e.target.value;
+  });
+
   downloadBtn.addEventListener('click', downloadLogo);
 }
 
@@ -103,6 +117,14 @@ function init() {
 function updateState(event) {
   const { id, value } = event.target;
   state[id] = value;
+  
+  // Debug log
+  console.log('State updated:', {
+    field: id,
+    value: value,
+    currentState: state
+  });
+
   updatePreview();
 }
 
@@ -171,45 +193,51 @@ function updatePreview() {
 
 // Generate logo
 async function generateLogo() {
-  if (!state.companyName) {
-    alert('Please enter a company name');
-    return;
-  }
+  // Show loading state first
+  const loadingMessage = document.createElement('div');
+  loadingMessage.className = 'loading-message';
+  loadingMessage.textContent = 'Generating your logo...';
+  previewArea.innerHTML = '';
+  previewArea.appendChild(loadingMessage);
   
-  if (state.selectedFonts.length === 0) {
-    alert('Please select at least one font');
-    return;
-  }
-  
-  if (state.selectedColors.length === 0) {
-    alert('Please select at least one color');
-    return;
-  }
-
-  // Add loading state
-  generateBtn.classList.add('loading');
   generateBtn.disabled = true;
 
   try {
-    const response = await fetch('/api/generate-logo', {
+    const companyName = document.getElementById('companyName').value.trim();
+    const industry = document.getElementById('industry').value;
+    const color = document.getElementById('colorInput').value.trim();
+
+    // More specific validation
+    if (!companyName) {
+      throw new Error('Please enter a company name');
+    }
+    if (!industry) {
+      throw new Error('Please select an industry');
+    }
+    if (!color) {
+      throw new Error('Please enter a color');
+    }
+
+    const response = await fetch('http://0.0.0.0:49153/generate-logo', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(state)
+      body: JSON.stringify({
+        inputs: `Logo for '${industry}' with text '${companyName}' and slogan '${state.slogan || ''}', color '${color}'`
+      })
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error);
+      throw new Error(`Server error: ${response.status}`);
     }
 
-    const data = await response.json();
+    const blob = await response.blob();
+    const imgUrl = URL.createObjectURL(blob);
     
     // Update preview with generated logo
-    const previewArea = document.getElementById('previewArea');
     const img = document.createElement('img');
-    img.src = data.previewUrl;
+    img.src = imgUrl;
     img.style.maxWidth = '100%';
     img.style.height = 'auto';
     
@@ -218,13 +246,21 @@ async function generateLogo() {
 
     // Show download button
     downloadArea.style.display = 'block';
-    downloadBtn.dataset.logoId = data.id;
-    
+    downloadBtn.onclick = () => {
+      const a = document.createElement('a');
+      a.href = imgUrl;
+      a.download = `${companyName.toLowerCase().replace(/\s+/g, '-')}-logo.png`;
+      a.click();
+    };
+
   } catch (error) {
-    alert('Error generating logo: ' + error.message);
+    // Show error in preview area
+    const errorMessage = document.createElement('div');
+    errorMessage.className = 'error-message';
+    errorMessage.textContent = error.message;
+    previewArea.innerHTML = '';
+    previewArea.appendChild(errorMessage);
   } finally {
-    // Remove loading state
-    generateBtn.classList.remove('loading');
     generateBtn.disabled = false;
   }
 }
@@ -252,76 +288,5 @@ async function downloadLogo() {
   }
 }
 
-// Initialize the app
-init();
-
-// Updated generateLogo function to send data to backend
-// Update generateLogo function
-async function generateLogo() {
-  console.log("Generate button clicked!");
-
-  const companyName = document.getElementById('companyName').value.trim();
-  const slogan = document.getElementById('slogan').value.trim();
-  const color = document.getElementById('color').value.trim();
-  const industry = document.getElementById('industry').value.trim();
-
-  if (!companyName || !color || !industry) {
-      const previewArea = document.getElementById('previewArea');
-      previewArea.innerHTML = '<p class="error-message">Please fill out all required fields.</p>';
-      return;
-  }
-
-  const previewArea = document.getElementById('previewArea');
-  previewArea.innerHTML = '<p class="loading-message">Generating logo...</p>';
-
-  const generateBtn = document.getElementById('generateBtn');
-  generateBtn.disabled = true;
-  generateBtn.textContent = 'Generating...';
-
-  try {
-      const response = await fetch('/generate-logo', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-              inputs: `Logo for '${industry}' with text '${companyName}' and slogan '${slogan}', color '${color}'.`,
-          }),
-      });
-
-      if (!response.ok) {
-          const error = await response.json();
-          console.error("Error:", error);
-          throw new Error(error.error);
-      }
-
-      // Process the generated image blob
-      const blob = await response.blob();
-      const imgUrl = URL.createObjectURL(blob);
-
-      // Display the image in the preview area
-      const img = document.createElement('img');
-      img.src = imgUrl;
-      img.alt = 'Generated Logo';
-      img.style.maxWidth = '100%';
-      img.style.height = 'auto';
-
-      previewArea.innerHTML = '';
-      previewArea.appendChild(img);
-
-      // Show and configure the download button
-      const downloadArea = document.getElementById('downloadArea');
-      const downloadBtn = document.getElementById('downloadBtn');
-      downloadArea.style.display = 'block'; // Make the button visible
-      downloadBtn.onclick = () => {
-          const a = document.createElement('a');
-          a.href = imgUrl;
-          a.download = `${companyName.toLowerCase().replace(/\\s+/g, '-')}-logo.png`;
-          a.click();
-      };
-  } catch (error) {
-      console.error("Error occurred:", error.message);
-      previewArea.innerHTML = `<p class="error-message">Error: ${error.message}</p>`;
-  } finally {
-      generateBtn.disabled = false;
-      generateBtn.textContent = 'Generate Logo';
-  }
-}
+// Call init when the page loads
+document.addEventListener('DOMContentLoaded', init);
