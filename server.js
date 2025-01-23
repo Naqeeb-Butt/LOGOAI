@@ -29,7 +29,7 @@ async function retryAxios(requestFn, retries) {
             if (attempt === retries) {
                 throw error;
             }
-            await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY * attempt)); // Exponential backoff
+            await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY * attempt));
         }
     }
 }
@@ -43,9 +43,8 @@ app.post('/generate-logo', async (req, res) => {
     });
 
     try {
-        // Validate API key exists
         if (!process.env.HUGGINGFACE_API_KEY) {
-            throw new Error('API key not configured');
+            throw new Error('HUGGINGFACE_API_KEY not configured');
         }
 
         const response = await retryAxios(() => 
@@ -57,13 +56,11 @@ app.post('/generate-logo', async (req, res) => {
                     'Content-Type': 'application/json'
                 },
                 data: { inputs },
-                responseType: 'arraybuffer',
-                validateStatus: (status) => status === 200
+                responseType: 'arraybuffer'
             }),
             MAX_RETRIES
         );
 
-        // Send the image response
         res.set('Content-Type', 'image/png');
         res.send(response.data);
 
@@ -71,17 +68,14 @@ app.post('/generate-logo', async (req, res) => {
         console.error('API Error:', {
             message: error.message,
             response: error.response?.data?.toString(),
-            status: error.response?.status
+            status: error.response?.status,
+            stack: error.stack
         });
         
-        // Send more specific error messages
-        const errorMessage = error.response?.status === 401 
-            ? 'Authentication failed - please check API key'
-            : 'Failed to generate logo';
-            
-        res.status(error.response?.status || 500).json({
-            error: errorMessage,
-            details: error.message
+        res.status(500).json({
+            error: 'Failed to generate logo',
+            details: error.message,
+            status: error.response?.status
         });
     }
 });
