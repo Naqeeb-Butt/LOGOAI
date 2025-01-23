@@ -6,14 +6,9 @@ const path = require('path');
 const cors = require('cors');
 
 const app = express();
-const PORT = process.env.PORT || 49153;
+const PORT = 49153;
 
-app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
+app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -25,7 +20,7 @@ async function retryAxios(requestFn, retries) {
         try {
             return await requestFn();
         } catch (error) {
-            console.error(`Attempt ${attempt} failed:`, error.response?.data || error.message);
+            console.error(Attempt ${attempt} failed:, error.response?.data || error.message);
             if (attempt === retries) {
                 throw error;
             }
@@ -36,14 +31,13 @@ async function retryAxios(requestFn, retries) {
 
 app.post('/generate-logo', async (req, res) => {
     const { inputs } = req.body;
-    
-    console.log('Request received:', {
-        inputs,
-        hasApiKey: !!process.env.HUGGINGFACE_API_KEY
-    });
+
+    if (!inputs) {
+        return res.status(400).json({ error: 'Missing required input.' });
+    }
 
     try {
-        const response = await retryAxios(() => 
+        const response = await retryAxios(() =>
             axios.post(
                 'https://api-inference.huggingface.co/models/strangerzonehf/Flux-Midjourney-Mix-LoRA',
                 { inputs },
@@ -52,49 +46,20 @@ app.post('/generate-logo', async (req, res) => {
                         Authorization: Bearer ${process.env.HUGGINGFACE_API_KEY},
                         'Content-Type': 'application/json',
                     },
-                    responseType: 'arraybuffer',
-                    validateStatus: false
+                    responseType: 'arraybuffer', // Return as binary data
                 }
             ),
             MAX_RETRIES
         );
 
-        if (response.status !== 200) {
-            throw new Error(API Error: ${response.data.toString()});
-        }
-
         res.set('Content-Type', 'image/png');
-        res.send(response.data);
+        res.send(response.data); // Directly send the image blob
     } catch (error) {
-        console.error('Detailed error:', {
-            message: error.message,
-            status: error.response?.status,
-            data: error.response?.data?.toString(),
-            stack: error.stack
-        });
-        
-        res.status(500).json({
-            error: 'Failed to generate logo',
-            details: error.message,
-            status: error.response?.status
-        });
+        console.error('Error generating logo after retries:', error.response?.data || error.message);
+        res.status(500).json({ error: 'Failed to generate logo after multiple attempts. Please try again later.' });
     }
 });
 
-app.use((err, req, res, next) => {
-    console.error('Error:', err);
-    res.status(500).json({
-        error: 'Internal Server Error',
-        message: err.message
-    });
-});
-
-app.get('/health', (req, res) => {
-    res.status(200).send('OK');
-});
-
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server is running at http://0.0.0.0:${PORT}`);
-    console.log('Environment:', process.env.NODE_ENV);
-    console.log('API Key exists:', !!process.env.HUGGINGFACE_API_KEY);
+app.listen(49153, '0.0.0.0', () => { 
+    console.log('Server is running on port 49153');
 });
