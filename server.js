@@ -13,33 +13,33 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const MAX_RETRIES = 5;
-const RETRY_DELAY = 1000; // in milliseconds
+const RETRY_DELAY = 5000; // 5 seconds
 
-// Retry mechanism for API calls
 async function retryAxios(requestFn, retries) {
     for (let attempt = 1; attempt <= retries; attempt++) {
         try {
+            console.log(Attempt ${attempt}...);
             return await requestFn();
         } catch (error) {
-            console.error(`Attempt ${attempt} failed:`, error.response?.data || error.message);
+            console.error(Attempt ${attempt} failed:, error.response?.data || error.message);
             if (attempt === retries) {
                 throw error;
             }
-            await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY * attempt)); // Exponential backoff
+            console.log(Retrying in ${RETRY_DELAY * attempt}ms...);
+            await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY * attempt));
         }
     }
 }
 
-// Endpoint to generate logo
 app.post('/generate-logo', async (req, res) => {
     const { inputs } = req.body;
 
     if (!inputs) {
+        console.error('Missing required inputs.');
         return res.status(400).json({ error: 'Missing required input.' });
     }
 
     try {
-        // Log for debugging
         console.log('API Key:', process.env.HUGGINGFACE_API_KEY1);
         console.log('Inputs:', inputs);
 
@@ -49,20 +49,25 @@ app.post('/generate-logo', async (req, res) => {
                 { inputs },
                 {
                     headers: {
-                        Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY1}`,
+                        Authorization: Bearer ${process.env.HUGGINGFACE_API_KEY1},
                         'Content-Type': 'application/json',
                     },
-                    responseType: 'arraybuffer', // Return as binary data
+                    timeout: 30000,
+                    responseType: 'arraybuffer',
                 }
             ),
             MAX_RETRIES
         );
 
-        // Send the generated image to the client
+        console.log('HuggingFace API response received.');
         res.set('Content-Type', 'image/png');
         res.send(response.data);
     } catch (error) {
         console.error('Error generating logo:', error.response?.data || error.message);
+        if (error.response?.headers['content-type']?.includes('text/html')) {
+            console.error('HTML error response received:', error.response.data);
+            return res.status(500).json({ error: 'Unexpected HTML response from HuggingFace.' });
+        }
         res.status(500).json({
             error: `Failed to generate logo after multiple attempts. Details: ${
                 error.response?.data?.error || error.message
@@ -72,17 +77,13 @@ app.post('/generate-logo', async (req, res) => {
 });
 
 app.get('/check-env', (req, res) => {
-    res.send(`HUGGINGFACE_API_KEY1: ${process.env.HUGGINGFACE_API_KEY1}`);
+    res.send(HUGGINGFACE_API_KEY1: ${process.env.HUGGINGFACE_API_KEY1});
 });
 
-// Catch-all route for serving the frontend
 app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
 
-
-
-
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(Server is running on port ${PORT});
 });
