@@ -37,10 +37,9 @@ app.post('/generate-logo', async (req, res) => {
     }
 
     try {
-        const apiUrl = 'https://api-inference.huggingface.co/models/strangerzonehf/Flux-Midjourney-Mix-LoRA';
         const response = await retryAxios(() =>
             axios.post(
-                apiUrl,
+                'https://api-inference.huggingface.co/models/strangerzonehf/Flux-Midjourney-Mix-LoRA',
                 { inputs },
                 {
                     headers: {
@@ -56,10 +55,19 @@ app.post('/generate-logo', async (req, res) => {
         res.set('Content-Type', 'image/png');
         res.send(response.data); // Directly send the image blob
     } catch (error) {
-        console.error('Error generating logo after retries:', error.response?.data || error.message);
-        res.status(500).json({ error: 'Failed to generate logo after multiple attempts. Please try again later.' });
+        console.error('Error generating logo:', {
+            status: error.response?.status,
+            headers: error.response?.headers,
+            data: error.response?.data,
+        });
+        res.status(500).json({
+            error: `Failed to generate logo after multiple attempts. Details: ${
+                error.response?.data?.error || error.message
+            }`,
+        });
     }
 });
+
 
 // Catch-all route for serving static files
 app.get('*', (req, res) => {
